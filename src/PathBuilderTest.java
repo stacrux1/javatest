@@ -16,7 +16,17 @@ class PathBuilderTest {
         Bound dc = new Bound("d", "c", 2);
         Bound bd = new Bound("b", "d", 1);
         Collection<Bound> bounds = Arrays.asList(ab, ac, bc, dc, bd, ad);
-        Collection<Collection<Bound>> result = PathBuilder.returnAllPossiblePaths("a", "c", bounds);
+        Collection<Collection<Bound>> result =
+                PathBuilder.returnAllPossiblePaths("a", "c", bounds);
+        /*
+            a
+                b       -       d       -       c
+                c               c
+                    d               b
+                    c               c
+            expecting: (abc), (abdc), (adc), (adbc), (ac)
+         */
+        assertEquals(5, result.size());
     }
 
     @Test
@@ -28,6 +38,13 @@ class PathBuilderTest {
         Bound dc = new Bound("d", "c", 2);
         Bound bd = new Bound("b", "d", 1);
         Collection<Bound> bounds = Arrays.asList(ab, ac, bc, dc, bd, ad);
-        Collection<Collection<Bound>> result = PathBuilder.returnAllPossiblePathsOrderedByTime("a", "c", bounds);
+        Collection<Collection<Bound>> result =
+                    PathBuilder.returnAllPossiblePathsOrderedByTime("a", "c", bounds);
+        int previous = 0;
+        for (Collection<Bound> path : result){
+            int pathDuration = path.stream().mapToInt(bnd -> bnd.duration).sum();
+            assertTrue(pathDuration >= previous);
+            previous = pathDuration;
+        }
     }
 }
